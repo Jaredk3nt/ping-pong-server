@@ -1,0 +1,31 @@
+{
+  "name": "ping-pong-server",
+  "version": "1.0.0",
+  "description": "Ping-Pong backend ",
+  "main": "app.js",
+  "scripts": {
+    "babel-node": "babel-node --presets=latest",
+    "start": "nodemon --exec npm run babel-node -- ./app.js",
+    "build": "babel src -d dist"
+  },
+  "author": "Jared K Jones",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.307.0",
+    "body-parser": "^1.18.3",
+    "express": "^4.16.3",
+    "node-fetch": "^2.2.0",
+    "uuid": "^3.3.2"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-latest": "^6.24.1",
+    "dotenv": "^6.0.0",
+    "nodemon": "^1.18.4"
+  },
+  "babel": {
+    "presets": [
+      "latest"
+    ]
+  }
+}
