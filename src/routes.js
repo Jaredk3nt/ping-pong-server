@@ -8,6 +8,6 @@ router.get('/players', Service.getPlayers);
 router.post('/players', Service.createPlayer);
 router.get('/players/:id', Service.getPlayerById);
 router.put('/players/:id', Service.addGamesToPlayer);
-router.put('/games', Service.addGame);
+router.post('/games', Service.addGame);
 
 module.exports = router;

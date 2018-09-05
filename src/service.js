@@ -1,7 +1,7 @@
 const uuid = require('uuid/v4');
 
 function Service(dynamo) {
-    const tableName = 'PingPongPlayers';
+    const tableName = 'ping-pong-players';
 
     const getPlayers = async (req, res, next) => {
         try {
@@ -36,16 +36,12 @@ function Service(dynamo) {
 
     const getPlayerById = async (req, res, next) => {
         const { params: { id } } = req;
-        console.log(id);
         try {
-            const awsres = await dynamo.query({
+            const awsres = await dynamo.get({
                 TableName: tableName,
-                ExpressionAttributeValues: {
-                    ":id": id
-                }, 
-                KeyConditionExpression: "id = :id", 
+                Key: { id }
             }).promise();
-            res.status(200).json(awsres.Items);
+            res.status(200).json(awsres.Item);
         } catch (err) {
             console.log(err.message);
             res.status(500).send();
@@ -54,21 +50,57 @@ function Service(dynamo) {
 
     const addGamesToPlayer = async (req, res, next) =>  {
         const { params: { id }, body: { didWin } } = req;
-        res.status(200).json({
-            message: `updated ${id}`,
-        });
+        try {
+            await updatePlayer(id, didWin);
+            res.status(200).json({
+                message: `updated ${id}`,
+            });
+        } catch (err) {
+            console.log(err.message);
+            res.status(500).send();
+        }
     }
 
-    const addgame = async (req, res, next) => {
+    const addGame = async (req, res, next) => {
         const { body: { table, winningSide } } = req;
+        try {
+            await updatePlayer(table.left.player1.id, winningSide === 'left');
+            await updatePlayer(table.left.player2.id, winningSide === 'left');
+            await updatePlayer(table.right.player1.id, winningSide === 'right');
+            await updatePlayer(table.right.player2.id, winningSide === 'right');
+            res.status(200).json({
+                message: `Added game to database`,
+            });
+        } catch (err) {
+            console.log(err.message);
+            res.status(500).send();
+        }
         res.status(200).send();
+    }
+
+    const updatePlayer = async (playerId, didWin) => {
+        const awsres = await dynamo.update({
+            TableName: tableName,
+            Key: { id: playerId },
+            ExpressionAttributeNames: {
+                "#G": "games", 
+                "#W": "wins"
+            }, 
+            ExpressionAttributeValues: {
+                ":g": 1, 
+                ":w": didWin ? 1 : 0
+            },
+            UpdateExpression: "ADD #G :g, #W :w" 
+        }).promise();
+        return awsres;
     }
 
     return {
         getPlayers,
         getPlayerById,
         createPlayer,
-        addGamesToPlayer
+        addGamesToPlayer,
+        addGame
     }
 }
 
