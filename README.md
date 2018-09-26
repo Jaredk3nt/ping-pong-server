@@ -1,8 +1,8 @@
-const express = require('express');
-const router = express.Router();
-const AWS = require('aws-sdk');
-var docClient = new AWS.DynamoDB.DocumentClient({region: 'us-west-2'});
-const Service = require('./service')(docClient);
+# Ping Pong Server
+
+Backend portion to [ping-pong](https://github.com/Jaredk3nt/ping-pong) a doubles queueing and win record tracking application.
+
+## Route Documentation
 
 router.get('/players', Service.getPlayers);
 /*
@@ -30,5 +30,3 @@ Body: {
 }
  */
 router.post('/games', Service.addGame);
-
-module.exports = router;

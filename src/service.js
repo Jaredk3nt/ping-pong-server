@@ -73,15 +73,15 @@ function Service(dynamo) {
             });
         } catch (err) {
             console.log(err.message);
-            res.status(500).send();
+            res.status(500).json(err);
         }
         res.status(200).send();
     }
 
-    const updatePlayer = async (playerId, didWin) => {
+    const updatePlayer = async (id, didWin) => {
         const awsres = await dynamo.update({
             TableName: tableName,
-            Key: { id: playerId },
+            Key: { id },
             ExpressionAttributeNames: {
                 "#G": "games", 
                 "#W": "wins"
