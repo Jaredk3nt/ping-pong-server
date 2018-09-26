@@ -18,16 +18,17 @@ function Service(dynamo) {
     const createPlayer = async (req, res, next) => {
         const { body: { name } } = req;
         try {
+            const newPlayer = {
+                name,
+                id: uuid(),
+                games: 0,
+                wins: 0
+            }
             const awsres = await dynamo.put({
                 TableName: tableName,
-                Item: {
-                    name,
-                    id: uuid(),
-                    games: 0,
-                    wins: 0
-                }
+                Item: newPlayer
             }).promise();
-            res.status(200).send();
+            res.status(200).json(newPlayer);
         } catch (err) {
             console.log(err);
             res.status(500).send();
@@ -62,12 +63,12 @@ function Service(dynamo) {
     }
 
     const addGame = async (req, res, next) => {
-        const { body: { table, winningSide } } = req;
+        const { body: { table, winningSide }, body } = req;
         try {
-            await updatePlayer(table.left.player1.id, winningSide === 'left');
-            await updatePlayer(table.left.player2.id, winningSide === 'left');
-            await updatePlayer(table.right.player1.id, winningSide === 'right');
-            await updatePlayer(table.right.player2.id, winningSide === 'right');
+            await updatePlayer(table.left.player1, winningSide === 'left');
+            await updatePlayer(table.left.player2, winningSide === 'left');
+            await updatePlayer(table.right.player1, winningSide === 'right');
+            await updatePlayer(table.right.player2, winningSide === 'right');
             res.status(200).json({
                 message: `Added game to database`,
             });
